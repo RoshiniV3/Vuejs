@@ -168,37 +168,6 @@ const refreshChart = (): void => {
 }
 
 const toggleFullscreen = (): void => {
-  const chartCard = chartCanvas.value?.closest('.chart-card') as HTMLElement
-  if (!chartCard) return
-
-  if (!document.fullscreenElement) {
-    // Enter fullscreen
-    chartCard.requestFullscreen().then(() => {
-      chartCard.classList.add('fullscreen-mode')
-      // Resize chart after entering fullscreen
-      setTimeout(() => {
-        if (chartInstance.value) {
-          chartInstance.value.resize()
-        }
-      }, 100)
-    }).catch(err => {
-      console.error('Error entering fullscreen:', err)
-    })
-  } else {
-    // Exit fullscreen
-    document.exitFullscreen().then(() => {
-      chartCard.classList.remove('fullscreen-mode')
-      // Resize chart after exiting fullscreen
-      setTimeout(() => {
-        if (chartInstance.value) {
-          chartInstance.value.resize()
-        }
-      }, 100)
-    }).catch(err => {
-      console.error('Error exiting fullscreen:', err)
-    })
-  }
-
   emit('toggle-fullscreen')
 }
 
@@ -304,34 +273,7 @@ onUnmounted(() => {
   font-size: 0.75rem;
 }
 
-/* Fullscreen mode styles */
-.chart-card.fullscreen-mode {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 9999 !important;
-  border-radius: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-}
 
-.chart-card.fullscreen-mode .chart-body {
-  padding: 2rem;
-}
-
-.chart-card.fullscreen-mode .chart-container {
-  height: calc(100vh - 200px) !important;
-}
-
-.chart-card.fullscreen-mode .chart-title {
-  font-size: 1.25rem;
-}
-
-.chart-card.fullscreen-mode .chart-subtitle {
-  font-size: 0.9rem;
-}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
