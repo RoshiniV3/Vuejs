@@ -1,0 +1,136 @@
+/* Global Color Variables */
+:root {
+  /* Custom Brand Colors */
+  --color-red: rgb(220, 53, 69);
+  --color-green: rgb(0, 178, 151);
+  --color-black: #2C455C;
+  --color-vue-green: #42b983;
+
+  /* Bootstrap Color Overrides */
+  --color-primary: #2C455C;
+  --color-secondary: #6c757d;
+  --color-success: var(--color-green);
+  --color-danger: var(--color-red);
+  --color-warning: #ffc107;
+  --color-info: #0dcaf0;
+  --color-light: #f8f9fa;
+  --color-dark: var(--color-black);
+  
+  /* Card Colors from Dashboard */
+  --card-teal: rgb(0, 178, 151);
+  --card-red: rgb(220, 53, 69);
+  --card-blue:  rgb(8, 102, 198);;
+  --card-dark: #2C455C;
+
+  /* Semi-transparent colors for charts */
+  --color-red-transparent: rgba(220, 53, 69, 0.2);
+  --color-blue-transparent: rgba(8, 102, 198, 0.2);
+  --color-green-transparent: rgba(0, 178, 151, 0.2);
+
+  /* Chart grid and border colors */
+  --chart-grid-color: rgba(0, 0, 0, 0.1);
+  --chart-border-white: #ffffff;
+
+  /* Chart shadow colors */
+  --chart-shadow-light: rgba(0, 0, 0, 0.1);
+  --chart-shadow-medium: rgba(0, 0, 0, 0.15);
+  --chart-shadow-dark: rgba(0, 0, 0, 0.2);
+}
+
+/* Utility Classes for Background Colors */
+.bg-custom-red {
+  background-color: var(--color-red) !important;
+}
+
+.bg-custom-green {
+  background-color: var(--color-green) !important;
+}
+
+.bg-custom-black {
+  background-color: var(--color-black) !important;
+}
+
+.bg-card-teal {
+  background-color: var(--card-teal) !important;
+}
+
+.bg-card-red {
+  background-color: var(--card-red) !important;
+}
+
+.bg-card-blue {
+  background-color: var(--card-blue) !important;
+}
+
+.bg-card-dark {
+  background-color: var(--card-dark) !important;
+}
+
+/* Utility Classes for Text Colors */
+.text-custom-red {
+  color: var(--color-red) !important;
+}
+
+.text-custom-green {
+  color: var(--color-green) !important;
+}
+
+.text-custom-black {
+  color: var(--color-black) !important;
+}
+
+.text-card-teal {
+  color: var(--card-teal) !important;
+}
+
+.text-card-red {
+  color: var(--card-red) !important;
+}
+
+.text-card-blue {
+  color: var(--card-blue) !important;
+}
+
+.text-card-dark {
+  color: var(--card-dark) !important;
+}
+
+/* Utility Classes for Border Colors */
+.border-custom-red {
+  border-color: var(--color-red) !important;
+}
+
+.border-custom-green {
+  border-color: var(--color-green) !important;
+}
+
+.border-custom-black {
+  border-color: var(--color-black) !important;
+}
+
+/* Layout Positioning */
+.custom-navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1030 !important;
+}
+
+.sidebar-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 1020 !important;
+  overflow-y: auto !important;
+  padding-top: 60px !important;
+}
+
+.sidebar-header {
+  display: none !important;
+}
+
+.sidebar-nav {
+  padding-top: 1rem !important;
+}
