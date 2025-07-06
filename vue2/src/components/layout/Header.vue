@@ -4,7 +4,7 @@
       <!-- Left section: Toggle button and brand -->
       <div class="d-flex align-items-center">
         <button
-          class="navbar-toggler sidebar-toggle me-3"
+          class="navbar-toggler sidebar-toggle me-2"
           type="button"
           @click="toggleSidebar"
           aria-label="Toggle sidebar"
@@ -18,7 +18,7 @@
       </div>
 
       <!-- Center section: Search -->
-      <div class="flex-grow-1 d-flex justify-content-center mx-4">
+      <div class="flex-grow-1 d-flex justify-content-center mx-3">
         <div class="search-container">
           <input
             class="form-control search-input"
@@ -31,15 +31,15 @@
       </div>
 
       <!-- Right section: User actions -->
-      <div class="d-flex align-items-center gap-3">
-        <i class="bi bi-bell text-white fs-5 cursor-pointer" title="Notifications"></i>
-        <i class="bi bi-github text-white fs-5 cursor-pointer" title="GitHub"></i>
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-bell text-white cursor-pointer header-icon" title="Notifications"></i>
+        <i class="bi bi-github text-white cursor-pointer header-icon" title="GitHub"></i>
         <img
-          src="https://i.pravatar.cc/36"
+          src="https://i.pravatar.cc/3"
           alt="avatar"
           class="rounded-circle border cursor-pointer"
-          width="32"
-          height="32"
+          width="28"
+          height="28"
           title="User Profile"
         />
       </div>
@@ -66,17 +66,19 @@ export default {
 <style scoped>
 .custom-navbar {
   background-color: var(--color-black) !important;
-  padding: 0.75rem 1rem;
-  height: 60px;
+  padding: 0.5rem 1rem;
+  height: 50px;
+  min-height: 50px;
 }
 
 .sidebar-toggle {
   background: none;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s ease;
+  font-size: 1rem;
 }
 
 .sidebar-toggle:hover {
@@ -90,8 +92,9 @@ export default {
 
 .navbar-brand {
   color: white !important;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
+  margin-bottom: 0;
 }
 
 .search-container {
@@ -104,8 +107,10 @@ export default {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding-right: 40px;
+  padding: 0.375rem 40px 0.375rem 0.75rem;
   border-radius: 6px;
+  font-size: 0.875rem;
+  height: 32px;
 }
 
 .search-input::placeholder {
@@ -135,6 +140,10 @@ export default {
 
 .cursor-pointer:hover {
   opacity: 0.8;
+}
+
+.header-icon {
+  font-size: 1.1rem;
 }
 
 .text-success {
