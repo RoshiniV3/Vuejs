@@ -28,7 +28,7 @@
     </div>
     <div class="chart-body">
       <div class="chart-container" :style="{ height: height + 'px' }">
-        <canvas ref="chartCanvas"></canvas>
+        <canvas ref="chartCanvas" :key="chartKey"></canvas>
       </div>
     </div>
     <div class="chart-footer" v-if="showFooter">
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, toRaw } from 'vue'
 import {
   Chart,
   CategoryScale,
@@ -100,19 +100,54 @@ const emit = defineEmits<{
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
 const chartInstance = ref<Chart | null>(null)
 const lastUpdated = ref<string>(new Date().toLocaleTimeString())
+const chartKey = ref<number>(0)
+
+// Deep clone function to remove Vue reactivity completely
+const deepClone = (obj: any): any => {
+  try {
+    // Use JSON methods for a complete deep clone that removes all Vue reactivity
+    return JSON.parse(JSON.stringify(toRaw(obj)))
+  } catch (error) {
+    console.warn('Failed to JSON clone chart data, falling back to manual clone:', error)
+    // Fallback to manual cloning
+    if (obj === null || typeof obj !== 'object') return obj
+    if (obj instanceof Date) return new Date(obj.getTime())
+    if (obj instanceof Array) return obj.map(item => deepClone(item))
+    if (typeof obj === 'object') {
+      const clonedObj: any = {}
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          clonedObj[key] = deepClone(obj[key])
+        }
+      }
+      return clonedObj
+    }
+    return obj
+  }
+}
 
 const createChart = async (): Promise<void> => {
-  if (!chartCanvas.value || !props.chartData) return
+  if (!chartCanvas.value || !props.chartData) {
+    console.warn('BaseChart: Cannot create chart - missing canvas or data', {
+      hasCanvas: !!chartCanvas.value,
+      hasData: !!props.chartData
+    })
+    return
+  }
 
   // Destroy existing chart
   if (chartInstance.value) {
     chartInstance.value.destroy()
+    chartInstance.value = null
   }
 
   await nextTick()
 
+  // Clear the canvas
   const ctx = chartCanvas.value.getContext('2d')
   if (!ctx) return
+
+  ctx.clearRect(0, 0, chartCanvas.value.width, chartCanvas.value.height)
 
   const defaultOptions = {
     responsive: true,
@@ -140,29 +175,43 @@ const createChart = async (): Promise<void> => {
     } : undefined
   }
 
+  // Deep clone to completely remove Vue reactivity from Chart.js data
+  const clonedChartData = deepClone(toRaw(props.chartData))
+  const clonedChartOptions = deepClone(toRaw(props.chartOptions))
+
   const mergedOptions = {
     ...defaultOptions,
-    ...props.chartOptions
+    ...clonedChartOptions
   }
 
   chartInstance.value = new Chart(ctx, {
     type: props.chartType,
-    data: props.chartData,
+    data: clonedChartData,
     options: mergedOptions
+  })
+
+  console.log(`BaseChart: Successfully created ${props.chartType} chart for "${props.title}"`, {
+    datasetCount: clonedChartData?.datasets?.length || 0,
+    hasOptions: !!mergedOptions
   })
 }
 
 const refreshChart = (): void => {
   lastUpdated.value = new Date().toLocaleTimeString()
 
-  // Add refresh animation
+  // Properly destroy existing chart
   if (chartInstance.value) {
     chartInstance.value.destroy()
+    chartInstance.value = null
   }
 
-  // Small delay for visual feedback
-  setTimeout(() => {
-    createChart()
+  // Force canvas re-creation by updating key
+  chartKey.value += 1
+
+  // Small delay for visual feedback and to ensure DOM is ready
+  setTimeout(async () => {
+    await nextTick()
+    await createChart()
     emit('refresh')
   }, 200)
 }
@@ -171,15 +220,22 @@ const toggleFullscreen = (): void => {
   emit('toggle-fullscreen')
 }
 
-watch(() => props.chartData, () => {
-  if (chartInstance.value && props.chartData) {
-    chartInstance.value.data = props.chartData
-    chartInstance.value.update()
+watch(() => props.chartData, async () => {
+  if (props.chartData) {
+    // Force canvas re-creation and recreate chart completely
+    chartKey.value += 1
+    await nextTick()
+    await createChart()
   }
 }, { deep: true })
 
-watch(() => props.chartOptions, () => {
-  createChart()
+watch(() => props.chartOptions, async () => {
+  if (props.chartOptions) {
+    // Force canvas re-creation and recreate chart completely when options change
+    chartKey.value += 1
+    await nextTick()
+    await createChart()
+  }
 }, { deep: true })
 
 onMounted(() => {

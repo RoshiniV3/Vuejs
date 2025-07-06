@@ -212,7 +212,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseChart from '@/components/charts/BaseChart.vue'
 import UserDetailsForm from '@/components/ui/UserDetailsForm.vue'
@@ -248,8 +248,8 @@ const exportLoading = reactive({
   excel: false
 })
 
-// Chart data
-const lineData = reactive({
+// Chart data - using ref instead of reactive to avoid deep reactivity issues
+const lineData = ref({
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   datasets: [
     {
@@ -266,7 +266,7 @@ const lineData = reactive({
   ]
 })
 
-const earningsData = reactive({
+const earningsData = ref({
   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
   datasets: [
     {
@@ -279,7 +279,7 @@ const earningsData = reactive({
   ]
 })
 
-const pieData = reactive({
+const pieData = ref({
   labels: ['USA', 'Canada', 'UK', 'Germany', 'France'],
   datasets: [
     {
@@ -296,8 +296,8 @@ const pieData = reactive({
   ]
 })
 
-// Chart options
-const lineChartOptions = reactive({
+// Chart options - using ref instead of reactive to avoid deep reactivity issues
+const lineChartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -341,7 +341,7 @@ const lineChartOptions = reactive({
   }
 })
 
-const earningsChartOptions = reactive({
+const earningsChartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -385,7 +385,7 @@ const earningsChartOptions = reactive({
   }
 })
 
-const pieChartOptions = reactive({
+const pieChartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -403,19 +403,43 @@ const pieChartOptions = reactive({
 })
 
 // Methods
-const refreshLineChart = (): void => {
+const refreshLineChart = async (): Promise<void> => {
   // Generate new realistic data for line chart
   const newData = Array.from({ length: 6 }, () => Math.floor(Math.random() * 20) + 2)
-  lineData.datasets[0].data = newData
+
+  // Create a completely new data object to avoid reactivity issues
+  lineData.value = {
+    ...lineData.value,
+    datasets: [
+      {
+        ...lineData.value.datasets[0],
+        data: newData
+      }
+    ]
+  }
+
+  await nextTick()
 }
 
-const refreshEarningsChart = (): void => {
+const refreshEarningsChart = async (): Promise<void> => {
   // Generate new realistic data for earnings chart
   const newData = Array.from({ length: 6 }, () => Math.floor(Math.random() * 4000) + 1000)
-  earningsData.datasets[0].data = newData
+
+  // Create a completely new data object to avoid reactivity issues
+  earningsData.value = {
+    ...earningsData.value,
+    datasets: [
+      {
+        ...earningsData.value.datasets[0],
+        data: newData
+      }
+    ]
+  }
+
+  await nextTick()
 }
 
-const refreshPieChart = (): void => {
+const refreshPieChart = async (): Promise<void> => {
   // Generate new realistic data for pie chart
   const total = 100
   const usa = Math.floor(Math.random() * 40) + 30
@@ -424,40 +448,65 @@ const refreshPieChart = (): void => {
   const germany = Math.floor(Math.random() * 15) + 5
   const france = Math.max(0, total - usa - canada - uk - germany)
 
-  pieData.datasets[0].data = [usa, canada, uk, germany, france]
+  // Create a completely new data object to avoid reactivity issues
+  pieData.value = {
+    ...pieData.value,
+    datasets: [
+      {
+        ...pieData.value.datasets[0],
+        data: [usa, canada, uk, germany, france]
+      }
+    ]
+  }
+
+  await nextTick()
 }
 
 const toggleFullscreen = (chartType: string): void => {
   console.log(`Toggle fullscreen for ${chartType} chart`)
 
-  switch (chartType) {
+  try {
+    switch (chartType) {
     case 'line':
       fullscreenChart.value = 'line'
       fullscreenChartTitle.value = 'Site Views - Fullscreen'
       fullscreenChartSubtitle.value = 'Daily website traffic overview'
-      fullscreenChartData.value = lineData
-      fullscreenChartOptions.value = lineChartOptions
+      fullscreenChartData.value = lineData.value
+      fullscreenChartOptions.value = lineChartOptions.value
       break
     case 'pie':
       fullscreenChart.value = 'pie'
       fullscreenChartTitle.value = 'Visitors by Country - Fullscreen'
       fullscreenChartSubtitle.value = 'Geographic distribution of users'
-      fullscreenChartData.value = pieData
-      fullscreenChartOptions.value = pieChartOptions
+      fullscreenChartData.value = pieData.value
+      fullscreenChartOptions.value = pieChartOptions.value
       break
     case 'earnings':
       fullscreenChart.value = 'bar'
       fullscreenChartTitle.value = 'Earnings Overview - Fullscreen'
       fullscreenChartSubtitle.value = 'Revenue trends over time'
-      fullscreenChartData.value = earningsData
-      fullscreenChartOptions.value = earningsChartOptions
+      fullscreenChartData.value = earningsData.value
+      fullscreenChartOptions.value = earningsChartOptions.value
       break
-  }
+    default:
+      console.error(`Unknown chart type: ${chartType}`)
+      return
+    }
 
-  // Show scroll indicator after modal opens
-  setTimeout(() => {
-    checkScrollIndicator()
-  }, 100)
+    console.log('Fullscreen data set:', {
+      chartType: fullscreenChart.value,
+      title: fullscreenChartTitle.value,
+      hasData: !!fullscreenChartData.value,
+      hasOptions: !!fullscreenChartOptions.value
+    })
+
+    // Show scroll indicator after modal opens
+    setTimeout(() => {
+      checkScrollIndicator()
+    }, 100)
+  } catch (error) {
+    console.error('Error in toggleFullscreen:', error)
+  }
 }
 
 const closeFullscreen = (): void => {
