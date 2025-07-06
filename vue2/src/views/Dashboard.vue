@@ -56,7 +56,7 @@
         <BaseChart
           title="Earnings Overview"
           subtitle="Revenue trends over time"
-          chart-type="line"
+          chart-type="bar"
           :chart-data="earningsData"
           :chart-options="earningsChartOptions"
           :height="320"
@@ -234,15 +234,16 @@ export default {
         sales: 141291,
         rate: 30,
         unique: "33.45%",
-        earnings: [200, 450, 320, 690, 510],
-        siteViews: [500, 300, 400, 700, 850],
-        countryVisitors: [500, 300, 180, 120],
         // Task stats
         totalTasks: 19,
         completedTasks: 7,
         pendingTasks: 12,
         upcomingTasks: 5
       },
+      // Dynamic chart data
+      lineChartData: [5, 10, 15, 18, 12, 8],
+      earningsChartData: [1500, 2800, 1800, 4500, 5000, 2800],
+      pieChartData: [45, 20, 15, 12, 8],
       baseChartOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -287,12 +288,13 @@ export default {
     refreshLineChart() {
       console.log('Refreshing line chart...');
       // Generate new random data for site views
-      this.stats.siteViews = [
-        Math.floor(Math.random() * 800) + 200,
-        Math.floor(Math.random() * 800) + 200,
-        Math.floor(Math.random() * 800) + 200,
-        Math.floor(Math.random() * 800) + 200,
-        Math.floor(Math.random() * 800) + 200
+      this.lineChartData = [
+        Math.floor(Math.random() * 20) + 2,
+        Math.floor(Math.random() * 20) + 2,
+        Math.floor(Math.random() * 20) + 2,
+        Math.floor(Math.random() * 20) + 2,
+        Math.floor(Math.random() * 20) + 2,
+        Math.floor(Math.random() * 20) + 2
       ];
       // Force update to ensure reactivity
       this.$forceUpdate();
@@ -301,12 +303,14 @@ export default {
     refreshPieChart() {
       console.log('Refreshing pie chart...');
       // Generate new random data for country visitors
-      this.stats.countryVisitors = [
-        Math.floor(Math.random() * 600) + 100,
-        Math.floor(Math.random() * 500) + 100,
-        Math.floor(Math.random() * 300) + 50,
-        Math.floor(Math.random() * 200) + 50
-      ];
+      const total = 100;
+      const usa = Math.floor(Math.random() * 40) + 30;
+      const canada = Math.floor(Math.random() * 20) + 10;
+      const uk = Math.floor(Math.random() * 15) + 5;
+      const germany = Math.floor(Math.random() * 15) + 5;
+      const france = Math.max(0, total - usa - canada - uk - germany);
+
+      this.pieChartData = [usa, canada, uk, germany, france];
       // Force update to ensure reactivity
       this.$forceUpdate();
     },
@@ -314,12 +318,13 @@ export default {
     refreshEarningsChart() {
       console.log('Refreshing earnings chart...');
       // Generate new random data for earnings
-      this.stats.earnings = [
-        Math.floor(Math.random() * 500) + 100,
-        Math.floor(Math.random() * 500) + 100,
-        Math.floor(Math.random() * 500) + 100,
-        Math.floor(Math.random() * 500) + 100,
-        Math.floor(Math.random() * 500) + 100
+      this.earningsChartData = [
+        Math.floor(Math.random() * 4000) + 1000,
+        Math.floor(Math.random() * 4000) + 1000,
+        Math.floor(Math.random() * 4000) + 1000,
+        Math.floor(Math.random() * 4000) + 1000,
+        Math.floor(Math.random() * 4000) + 1000,
+        Math.floor(Math.random() * 4000) + 1000
       ];
       // Force update to ensure reactivity
       this.$forceUpdate();
@@ -345,7 +350,7 @@ export default {
           this.fullscreenChartOptions = this.pieChartOptions;
           break;
         case 'earnings':
-          this.fullscreenChart = 'line';
+          this.fullscreenChart = 'bar';
           this.fullscreenChartTitle = 'Earnings Overview - Fullscreen';
           this.fullscreenChartSubtitle = 'Revenue trends over time';
           this.fullscreenChartData = this.earningsData;
@@ -572,13 +577,18 @@ export default {
   computed: {
     lineData() {
       return {
-        labels: ['May 13', 'May 14', 'May 15', 'May 16', 'May 17'],
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [
           {
             label: 'Site Views',
-            data: this.stats.siteViews,
-            borderColor: this.getCSSVariable('--card-blue'),
-            fill: false
+            data: this.lineChartData,
+            borderColor: '#0866c6',
+            backgroundColor: 'rgba(8, 102, 198, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: '#0866c6',
+            pointBorderColor: '#0866c6',
+            pointRadius: 4
           }
         ]
       }
@@ -586,16 +596,18 @@ export default {
 
     pieData() {
       return {
-        labels: ['USA', 'China', 'Germany', 'UK'],
+        labels: ['USA', 'Canada', 'UK', 'Germany', 'France'],
         datasets: [
           {
+            data: this.pieChartData,
             backgroundColor: [
-              this.getCSSVariable('--card-blue'),
-              this.getCSSVariable('--color-red'),
-              this.getCSSVariable('--color-green'),
-              this.getCSSVariable('--color-warning')
+              '#0866c6',
+              '#20c997',
+              '#dc3545',
+              '#ffc107',
+              '#6c757d'
             ],
-            data: this.stats.countryVisitors
+            borderWidth: 0
           }
         ]
       }
@@ -603,14 +615,14 @@ export default {
 
     earningsData() {
       return {
-        labels: ['Jan 1', 'Jan 2', 'Jan 3', 'Jan 4', 'Jan 5'],
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
         datasets: [
           {
             label: 'Earnings',
-            data: this.stats.earnings,
-            backgroundColor: this.getCSSVariable('--color-red-transparent'),
-            borderColor: this.getCSSVariable('--color-red'),
-            fill: true
+            data: this.earningsChartData,
+            backgroundColor: '#20c997',
+            borderColor: '#20c997',
+            borderWidth: 1
           }
         ]
       }
