@@ -2,7 +2,7 @@
   <div class="sidebar-container d-flex flex-column" style="width: 240px; min-height: 100vh;">
     <!-- Header section with matching navbar background -->
     <div class="sidebar-header p-3 ps-4">
-      <h4 class="text-white mb-0">Admin Panel</h4>
+      <h4 class="text-white mb-0"> Panel</h4>
     </div>
     
     <!-- Navigation section with white background -->

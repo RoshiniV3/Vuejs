@@ -13,7 +13,7 @@
         </button>
 
         <div class="d-flex align-items-center">
-          <span class="navbar-brand mb-0 fw-semibold">Vue Admin Template</span>
+          <span class="navbar-brand mb-0 fw-semibold">Vue  Template</span>
         </div>
       </div>
 
